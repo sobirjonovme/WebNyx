@@ -1,4 +1,5 @@
 from webob import Request, Response
+from parse import parse
 
 
 class WebNyxApp:
@@ -15,17 +16,23 @@ class WebNyxApp:
     def handle_request(self, request):
         response = Response()
 
-        handler = self.find_handler(request.path)
+        handler, kwargs = self.find_handler(request.path)
 
         if handler is None:
             self.default_response(response)
         else:
-            handler(request, response)
+            handler(request, response, **kwargs)
 
         return response
 
-    def find_handler(self, path):
-        return self.routes.get(path, None)
+    def find_handler(self, request_path):
+        for path, handler in self.routes.items():
+            parse_result = parse(path, request_path)
+            if parse_result is not None:
+                return handler, parse_result.named
+
+        # if no handler matched the request path, return None
+        return None, None
 
     def default_response(self, response):
         response.status_code = 404
