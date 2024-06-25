@@ -1,3 +1,4 @@
+import inspect
 from webob import Request, Response
 from parse import parse
 
@@ -20,9 +21,15 @@ class WebNyxApp:
 
         if handler is None:
             self.default_response(response)
-        else:
-            handler(request, response, **kwargs)
+            return response
 
+        if inspect.isclass(handler):
+            handler = getattr(handler(), request.method.lower(), None)
+            if handler is None:
+                response.text = "Method not allowed"
+                return response
+
+        handler(request, response, **kwargs)
         return response
 
     def find_handler(self, request_path):
