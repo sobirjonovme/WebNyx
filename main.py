@@ -4,7 +4,7 @@ from app import WebNyxApp
 app = WebNyxApp()
 
 
-# Below codes is the same as below code
+# Below code is the same as following handler registering codes
 """
 decorator = app.route("/about")
 home = decorator(home)

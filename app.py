@@ -43,6 +43,11 @@ class WebNyxApp:
         This method is not a decorator, but it returns a decorator.
         It is called a decorator factory.
         """
+
+        # check if the path already exists in the routes dict
+        if path in self.routes:
+            raise AssertionError(f"Route already exists: {path}")
+
         def wrapper(handler):
             # this is the actual decorator
             self.routes[path] = handler
