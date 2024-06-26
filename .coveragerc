@@ -1,0 +1,13 @@
+[run]
+omit =
+    */site-packages/*
+    */dist-packages/*
+    */lib/python*
+    */lib64/python*
+    */share
+    main.py
+    env/*
+    venv/*
+    test_app.py
+    conftest.py
+

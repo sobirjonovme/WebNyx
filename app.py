@@ -1,4 +1,6 @@
 import inspect
+import requests
+import wsgiadapter
 from webob import Request, Response
 from parse import parse
 
@@ -26,6 +28,7 @@ class WebNyxApp:
         if inspect.isclass(handler):
             handler = getattr(handler(), request.method.lower(), None)
             if handler is None:
+                response.status_code = 405
                 response.text = "Method not allowed"
                 return response
 
@@ -62,3 +65,12 @@ class WebNyxApp:
 
         # return the actual decorator
         return wrapper
+
+    def test_session(self):
+        """
+        This method is not a test, but it is called by a test.
+        """
+        session = requests.Session()
+        session.mount(prefix="http://testserver", adapter=wsgiadapter.WSGIAdapter(self))
+        return session
+
