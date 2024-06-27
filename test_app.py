@@ -95,3 +95,14 @@ def test_class_based_routes_not_allowed(app, test_client):
     # see WebNyxApp.handle_request method for the response status code and text
     assert response.status_code == 405
     assert response.text == "Method not allowed"
+
+
+def test_route_alternative_adding_handler(app, test_client):
+    def new_handler(request, response):
+        response.text = "It is new handler"
+
+    app.add_handler("/new-handler", new_handler)
+
+    response = test_client.get("http://testserver/new-handler")
+    assert response.status_code == 200
+    assert response.text == "It is new handler"

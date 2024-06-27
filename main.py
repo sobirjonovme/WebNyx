@@ -33,3 +33,10 @@ class Books:
 
     def post(self, request, response):
         response.text = "Endpoint to create a book"
+
+
+def new_handler(request, response):
+    response.text = "It is new handler"
+
+
+app.add_handler("/new-handler", new_handler)
