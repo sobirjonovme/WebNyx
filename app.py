@@ -15,6 +15,8 @@ class WebNyxApp:
             loader=FileSystemLoader(os.path.abspath(templates_dir))
         )
 
+        self.exception_handler = None
+
     def __call__(self, environ, start_response):
         request = Request(environ)
 
@@ -38,7 +40,13 @@ class WebNyxApp:
                 response.text = "Method not allowed"
                 return response
 
-        handler(request, response, **kwargs)
+        try:
+            handler(request, response, **kwargs)
+        except Exception as e:
+            if self.exception_handler is None:
+                raise e
+            self.exception_handler(request, response, e)
+
         return response
 
     def find_handler(self, request_path):
@@ -92,3 +100,5 @@ class WebNyxApp:
 
         return rendered_html
 
+    def add_exception_handler(self, handler):
+        self.exception_handler = handler

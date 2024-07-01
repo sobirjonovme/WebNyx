@@ -124,3 +124,18 @@ def test_template_handler(app, test_client):
     assert "Best title" in response.text
     assert "Best body" in response.text
     assert "text/html" in response.headers["Content-Type"]
+
+
+def test_custom_exception_handler(app, test_client):
+    def on_handler(request, response, exc):
+        response.text = "Something bad happened"
+
+    app.add_exception_handler(on_handler)
+
+    @app.route("/exception")
+    def exception_throwing_handler(request, response):
+        raise AttributeError("some exception")
+
+    response = test_client.get(f"{BASE_URL}/exception")
+
+    assert response.text == "Something bad happened"

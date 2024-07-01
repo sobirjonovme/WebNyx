@@ -49,3 +49,15 @@ def template_handler(request, response):
         "test_template.html",
         context=context
     )
+
+
+def on_handler(request, response, exc):
+    response.text = "Something bad happened"
+
+
+app.add_exception_handler(on_handler)
+
+
+@app.route("/exception")
+def exception_throwing_handler(request, response):
+    raise AttributeError("some exception")
