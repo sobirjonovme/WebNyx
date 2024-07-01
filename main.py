@@ -40,3 +40,12 @@ def new_handler(request, response):
 
 
 app.add_handler("/new-handler", new_handler)
+
+
+@app.route("/template")
+def template_handler(request, response):
+    context = {"title": "Best title", "body": "It is html rendered page"}
+    response.body = app.template(
+        "test_template.html",
+        context=context
+    )

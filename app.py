@@ -1,13 +1,19 @@
+import os
 import inspect
 import requests
 import wsgiadapter
 from webob import Request, Response
 from parse import parse
+from jinja2 import Environment, FileSystemLoader
 
 
 class WebNyxApp:
-    def __init__(self):
+    def __init__(self, templates_dir="templates"):
         self.routes = dict()
+
+        self.template_env = Environment(
+            loader=FileSystemLoader(os.path.abspath(templates_dir))
+        )
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -76,4 +82,13 @@ class WebNyxApp:
         session = requests.Session()
         session.mount(prefix="http://testserver", adapter=wsgiadapter.WSGIAdapter(self))
         return session
+
+    def template(self, template_name, context: dict = None):
+        if context is None:
+            context = {}
+
+        template = self.template_env.get_template(template_name)
+        rendered_html = template.render(**context).encode()
+
+        return rendered_html
 
