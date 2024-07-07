@@ -20,13 +20,22 @@ class WebNyxApp:
 
         self.whitenoise = WhiteNoise(self.wsgi_app, root=static_dir)
 
+        self.middlewares = list()
+
     def __call__(self, environ, start_response):
         return self.whitenoise(environ, start_response)
 
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
 
+        # run middlewares before handling the request
+        self.middleware_process_request(request)
+
+        # handle the request
         response = self.handle_request(request)
+
+        # run middlewares after handling the request
+        self.middleware_process_response(request, response)
 
         return response(environ, start_response)
 
@@ -108,3 +117,16 @@ class WebNyxApp:
 
     def add_exception_handler(self, handler):
         self.exception_handler = handler
+
+    def add_middleware(self, middleware):
+        self.middlewares.append(middleware)
+
+    def middleware_process_request(self, request):
+        for middleware_cls in self.middlewares[::-1]:
+            middleware = middleware_cls()
+            middleware.process_request(request)
+
+    def middleware_process_response(self, request, response):
+        for middleware_cls in self.middlewares:
+            middleware = middleware_cls()
+            middleware.process_response(request, response)

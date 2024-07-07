@@ -1,4 +1,5 @@
 import pytest
+from middleware import Middleware
 
 BASE_URL = "http://testserver"
 
@@ -151,3 +152,28 @@ def test_serving_static_file(test_client):
     response = test_client.get(f"{BASE_URL}/test.css")
 
     assert response.text == "body {background-color: red;}"
+
+
+def test_middlewares_are_called(app, test_client):
+    process_request_called = False
+    process_response_called = False
+
+    class MyMiddleware(Middleware):
+        def process_request(self, request):
+            nonlocal process_request_called
+            process_request_called = True
+
+        def process_response(self, request, response):
+            nonlocal process_response_called
+            process_response_called = True
+
+    app.add_middleware(MyMiddleware)
+
+    @app.route("/home")
+    def home_handler(request, response):
+        response.text = "Home from handler"
+
+    test_client.get(f"{BASE_URL}/home")
+
+    assert process_request_called is True
+    assert process_response_called is True

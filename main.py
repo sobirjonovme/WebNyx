@@ -1,4 +1,5 @@
 from app import WebNyxApp
+from middleware import Middleware
 
 
 app = WebNyxApp()
@@ -61,3 +62,15 @@ app.add_exception_handler(on_handler)
 @app.route("/exception")
 def exception_throwing_handler(request, response):
     raise AttributeError("some exception")
+
+
+# adding middlewares
+class LoggingMiddleware(Middleware):
+    def process_request(self, request):
+        print("Processing request", request.url)
+
+    def process_response(self, request, response):
+        print("Processing response", request.url)
+
+
+app.add_middleware(LoggingMiddleware)
