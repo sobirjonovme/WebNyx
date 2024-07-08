@@ -42,17 +42,24 @@ class WebNyxApp:
     def handle_request(self, request):
         response = Response()
 
-        handler, kwargs = self.find_handler(request.path)
+        handler_data, kwargs = self.find_handler(request.path)
 
-        if handler is None:
+        if handler_data is None:
             self.default_response(response)
             return response
+
+        handler = handler_data["handler"]
+        allowed_methods = handler_data["allowed_methods"]
 
         if inspect.isclass(handler):
             handler = getattr(handler(), request.method.lower(), None)
             if handler is None:
-                response.status_code = 405
-                response.text = "Method not allowed"
+                self.method_not_allowed_response(response)
+                return response
+        else:
+            # so handler is function based, we need to check allowed methods
+            if request.method.lower() not in allowed_methods:
+                self.method_not_allowed_response(response)
                 return response
 
         try:
@@ -64,11 +71,15 @@ class WebNyxApp:
 
         return response
 
+    def method_not_allowed_response(self, response):
+        response.status_code = 405
+        response.text = "Method not allowed"
+
     def find_handler(self, request_path):
-        for path, handler in self.routes.items():
+        for path, handler_data in self.routes.items():
             parse_result = parse(path, request_path)
             if parse_result is not None:
-                return handler, parse_result.named
+                return handler_data, parse_result.named
 
         # if no handler matched the request path, return None
         return None, None
@@ -77,14 +88,18 @@ class WebNyxApp:
         response.status_code = 404
         response.text = "Not found!"
 
-    def add_handler(self, path, handler):
+    def add_handler(self, path, handler, allowed_methods=None):
         # check if the path already exists in the routes dict
         if path in self.routes:
             raise AssertionError(f"Route already exists: {path}")
 
-        self.routes[path] = handler
+        if allowed_methods is None:
+            allowed_methods = ["get", "head", "post", "put", "delete", "connect", "options", "trace", "patch"]
 
-    def route(self, path):
+        self.routes[path] = handler
+        self.routes[path] = {"handler": handler, "allowed_methods": allowed_methods}
+
+    def route(self, path, allowed_methods=None):
         """
         This method is not a decorator, but it returns a decorator.
         It is called a decorator factory.
@@ -92,7 +107,7 @@ class WebNyxApp:
 
         def wrapper(handler):
             # this function is the actual decorator
-            self.add_handler(path, handler)
+            self.add_handler(path, handler, allowed_methods)
             return handler
 
         # return the actual decorator

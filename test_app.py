@@ -36,9 +36,10 @@ def add_class_based_routes(app):
 
 
 def test_route_adding(app):
-    home, about = add_routes_to_app(app)
+    add_routes_to_app(app)
 
-    assert app.routes == {"/home": home, "/about": about}
+    assert "/home" in app.routes
+    assert "/about" in app.routes
 
 
 def test_duplicate_route_throws_exception(app):
@@ -177,3 +178,18 @@ def test_middlewares_are_called(app, test_client):
 
     assert process_request_called is True
     assert process_response_called is True
+
+
+def test_allowed_methods_for_function_based_handlers(app, test_client):
+    @app.route("/create-book", allowed_methods=["post"])
+    def book_create_handler(request, response):
+        response.text = "Create Book"
+        response.status_code = 201
+
+    response = test_client.post(f"{BASE_URL}/create-book")
+    assert response.status_code == 201
+    assert response.text == "Create Book"
+
+    response = test_client.get(f"{BASE_URL}/create-book")
+    assert response.status_code == 405
+    assert response.text == "Method not allowed"

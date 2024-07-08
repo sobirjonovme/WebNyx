@@ -22,6 +22,12 @@ def about(request, response):
     response.text = "Hello from the ABOUT page"
 
 
+@app.route("/create-book", allowed_methods=["post"])
+def book_create_handler(request, response):
+    response.text = "Book created successfully"
+    request.status_code = 201
+
+
 @app.route("/hello/{name}")
 def greeting(request, response, name):
     response.text = f"Hello, {name}!"
