@@ -1,5 +1,5 @@
-from app import WebNyxApp
-from middleware import Middleware
+from webnyx.app import WebNyxApp
+from webnyx.middleware import BaseMiddleware
 
 
 app = WebNyxApp()
@@ -58,6 +58,13 @@ def template_handler(request, response):
     )
 
 
+@app.route("/json")
+def json_handler(request, response):
+    data = {"title": "json response", "type": "json"}
+    response.json_body = data
+
+
+# Custom Exception
 def on_handler(request, response, exc):
     response.text = "Something bad happened"
 
@@ -71,7 +78,7 @@ def exception_throwing_handler(request, response):
 
 
 # adding middlewares
-class LoggingMiddleware(Middleware):
+class LoggingMiddleware(BaseMiddleware):
     def process_request(self, request):
         print("Processing request", request.url)
 

@@ -1,5 +1,5 @@
 import pytest
-from middleware import Middleware
+from webnyx.middleware import BaseMiddleware
 
 BASE_URL = "http://testserver"
 
@@ -159,7 +159,7 @@ def test_middlewares_are_called(app, test_client):
     process_request_called = False
     process_response_called = False
 
-    class MyMiddleware(Middleware):
+    class MyMiddleware(BaseMiddleware):
         def process_request(self, request):
             nonlocal process_request_called
             process_request_called = True

@@ -379,4 +379,5 @@ Temporary Items
 *.icloud
 
 celerybeat-schedule.db
-requirements.txt
+.coveragerc
+templates/

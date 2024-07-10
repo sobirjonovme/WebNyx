@@ -1,5 +1,5 @@
 import pytest
-from app import WebNyxApp
+from webnyx.app import WebNyxApp
 
 
 @pytest.fixture

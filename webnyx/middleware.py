@@ -1,6 +1,6 @@
 
 
-class Middleware:
+class BaseMiddleware:
     def process_request(self, request):
         pass
 
