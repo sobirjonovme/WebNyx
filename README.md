@@ -1,9 +1,9 @@
-# PyFrameUz: Python Web Framework built for learning purposes
+# WebNyx: Python Web Framework built for learning purposes
 
 ![purpose](https://img.shields.io/badge/purpose-learning-green)
-![PyPI - Version](https://img.shields.io/pypi/v/pyframeuz)
+![PyPI - Version](https://img.shields.io/pypi/v/webnyx)
 
-PyFrameUz is a Python web framework built for learning purposes.
+WebNyx is Simple Python Web Framework. It was built for learning purposes.
 
 It's a WSGI framework and can be used with any WSGI application server such as Gunicorn.
 
@@ -52,7 +52,7 @@ def template_handler(req, resp):
 ### Unit Tests
 
 The recommended way of writing unit tests is with [pytest](https://docs.pytest.org/en/latest/). There are two built in fixtures
-that you may want to use when writing unit tests with PyFrameUz. The first one is `app` which is an instance of the main `API` class:
+that you may want to use when writing unit tests with WebNyx. The first one is `app` which is an instance of the main `WebNyxApp` class:
 
 ```python
 import pytest
@@ -68,20 +68,20 @@ def test_route_overlap_throws_exception(app):
             resp.text = "Welcome Home2."
 ```
 
-The other one is `client` that you can use to send HTTP requests to your handlers. It is based on the famous [requests](https://requests.readthedocs.io/) and it should feel very familiar:
+The other one is `test_client` that you can use to send HTTP requests to your handlers. It is based on the famous [requests](https://requests.readthedocs.io/) and it should feel very familiar:
 
 ```python
-def test_parameterized_route(app, client):
+def test_parameterized_route(app, test_client):
     @app.route("/{name}")
     def hello(req, resp, name):
         resp.text = f"hey {name}"
 
-    assert client.get("http://testserver/matthew").text == "hey matthew"
+    assert test_client.get("http://testserver/matthew").text == "hey matthew"
 ```
 
 ## Templates
 
-The default folder for templates is `templates`. You can change it when initializing the main `APP()` class:
+The default folder for templates is `templates`. You can change it when initializing the main `WebNyxApp()` class:
 
 ```python
 app = WebNyxApp(templates_dir="templates_dir_name")
@@ -127,7 +127,7 @@ Then you can use the files inside this folder in HTML files:
 
 ### Middleware
 
-You can create custom middleware classes by inheriting from the `bumbo.middleware.Middleware` class and overriding its two methods
+You can create custom middleware classes by inheriting from the `webnyx.middleware.Middleware` class and overriding its two methods
 that are called before and after each request:
 
 ```python
